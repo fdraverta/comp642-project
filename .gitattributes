@@ -1,0 +1,2 @@
+trading_the_close_data/train.csv filter=lfs diff=lfs merge=lfs -text
+trading_the_close_data.zip filter=lfs diff=lfs merge=lfs -text
