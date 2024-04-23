@@ -36,7 +36,7 @@ DATA_SET_COLUMNS = [
 
 NUMERICAL_FEATURES = ['seconds_in_bucket', 'imbalance_size', 'reference_price', 
                       'matched_size', 'far_price', 'near_price', 'bid_price', 
-                      'bid_size', 'ask_price', 'ask_size', 'wap', 'target']
+                      'bid_size', 'ask_price', 'ask_size', 'wap']
 CATEGORICAL_FEATURES = ['stock_id', 'imbalance_buy_sell_flag']
 
 OTHER_FEATURES = ['row_id', 'time_id', 'date_id']
