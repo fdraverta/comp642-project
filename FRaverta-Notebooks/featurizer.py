@@ -99,6 +99,10 @@ class TradingAtTheCloseDS:
     def compute_baseline_model(self, simple_mapping=None):
         train_data, test_data = self.get_train_test_data()
 
+        # Create explicit copies to avoid "SettingWithCopyWarning"
+        train_data = train_data.copy()
+        test_data = test_data.copy()
+
         if simple_mapping is None:
             simple_mapping = {
                 1: 0.1,
@@ -106,8 +110,8 @@ class TradingAtTheCloseDS:
                 -1: -0.1
             }
 
-        train_data['simple_prediction'] = train_data['imbalance_buy_sell_flag'].map(simple_mapping)
-        test_data['simple_prediction'] = test_data['imbalance_buy_sell_flag'].map(simple_mapping)
+        train_data.loc[:, 'simple_prediction'] = train_data['imbalance_buy_sell_flag'].map(simple_mapping)
+        test_data.loc[:, 'simple_prediction'] = test_data['imbalance_buy_sell_flag'].map(simple_mapping)
 
         train_mae = (train_data['simple_prediction'] - train_data['target']).abs().mean()
         test_mae = (test_data['simple_prediction'] - test_data['target']).abs().mean()
