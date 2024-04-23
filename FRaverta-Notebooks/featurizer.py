@@ -69,17 +69,22 @@ class TradingAtTheCloseDS:
     # Link to the ZIP file
     zip_url = "https://media.githubusercontent.com/media/fdraverta/comp642-project/main/trading_the_close_data.zip?download=true&token=A362CLYGAPLZIW6YLGSGPGDGE23EQ"
 
-    def __init__(self):
+    def __init__(self, path_to_zip_with_data=None):
         self.data_set_columns = DATA_SET_COLUMNS
         self.numerical_features = NUMERICAL_FEATURES
         self.categorical_features = CATEGORICAL_FEATURES
         self.other_features = OTHER_FEATURES
         self.y_column = y
 
-        logger.info("Downloading ZIP file with the data set...")
-        response = requests.get(self.zip_url, allow_redirects=True)
-        zip_data = BytesIO(response.content)
-        
+        if path_to_zip_with_data is None:
+            logger.info("Downloading ZIP file with the data set...")
+            response = requests.get(self.zip_url, allow_redirects=True)
+            zip_data = BytesIO(response.content)
+        else:
+            logger.info("Using ZIP file with the data set from the provided path", path=path_to_zip_with_data)
+            zip_data = path_to_zip_with_data
+
+
         # Open the ZIP file
         logger.info("Opening ZIP file...")
         with zipfile.ZipFile(zip_data, 'r') as z:
@@ -121,10 +126,10 @@ class TradingAtTheCloseDS:
         return train_mae, test_mae
 
 
-
-data = TradingAtTheCloseDS()
-train_data, test_data = data.get_train_test_data()
-train_mae, test_mae = data.compute_baseline_model()
+if __name__ == '__main__':
+    data = TradingAtTheCloseDS("/home/fraverta/development/comp642-project/FRaverta-Notebooks/comp642-project/trading_the_close_data.zip")
+    train_data, test_data = data.get_train_test_data()
+    train_mae, test_mae = data.compute_baseline_model()
 
 
 
