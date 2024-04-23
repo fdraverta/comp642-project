@@ -68,6 +68,7 @@ class FeatureAdder(BaseEstimator, TransformerMixin):
 class TradingAtTheCloseDS:
     # Link to the ZIP file
     zip_url = "https://media.githubusercontent.com/media/fdraverta/comp642-project/main/trading_the_close_data.zip?download=true&token=A362CLYGAPLZIW6YLGSGPGDGE23EQ"
+    DAY_TRAIN_TEST_SPLIT_100_DAYS = (0, 100, 425, 451) 
 
     def __init__(self, path_to_zip_with_data=None):
         self.data_set_columns = DATA_SET_COLUMNS
@@ -77,7 +78,7 @@ class TradingAtTheCloseDS:
         self.y_column = y
 
         if path_to_zip_with_data is None:
-            logger.info("Downloading ZIP file with the data set...")
+            logger.info("Downloading ZIP file with the data set...", url=self.zip_url)
             response = requests.get(self.zip_url, allow_redirects=True)
             zip_data = BytesIO(response.content)
         else:
@@ -94,9 +95,16 @@ class TradingAtTheCloseDS:
                 self.data = pd.read_csv(file)
         logger.info("Data set loaded successfully.")
     
-    def get_train_test_data(self):
-        train_data = self.data.loc[self.data['date_id'] < 425]
-        test_data = self.data.loc[self.data['date_id'] >= 425]
+    def get_train_test_data(self, day_from_train=0, day_to_train=425, day_from_test=425, day_to_test=482):
+        assert day_from_train < day_to_train, "day_from_train must be less than day_to_train"
+        assert day_to_train <= day_from_test, "day_to_train must be less than day_from_test"
+        assert day_from_test < day_to_test, "day_from_test must be less than day_to_test"
+        
+        train_data = self.data.loc[(day_from_train <= self.data['date_id']) &  (self.data['date_id'] < day_to_train)]
+        test_data = self.data.loc[(day_from_test <= self.data['date_id']) & (self.data['date_id'] < day_to_test)]
+
+        logger.info("Train and test data sets created.", train_data=train_data.shape, test_data=test_data.shape, 
+                    test_proportion=test_data.shape[0] / train_data.shape[0])
         
         return train_data, test_data
 
@@ -128,9 +136,7 @@ class TradingAtTheCloseDS:
 
 if __name__ == '__main__':
     data = TradingAtTheCloseDS("/home/fraverta/development/comp642-project/FRaverta-Notebooks/comp642-project/trading_the_close_data.zip")
-    train_data, test_data = data.get_train_test_data()
-    train_mae, test_mae = data.compute_baseline_model()
-
+    train_data, test_data = data.get_train_test_data(*(data.DAY_TRAIN_TEST_SPLIT_100_DAYS))
 
 
 """usage example"""
